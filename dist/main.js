@@ -68,6 +68,58 @@ function _connectApiWeather() {
 
 /***/ }),
 
+/***/ "./src/homePage.js":
+/*!*************************!*\
+  !*** ./src/homePage.js ***!
+  \*************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ homePage)
+/* harmony export */ });
+/* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! regenerator-runtime/runtime */ "./node_modules/regenerator-runtime/runtime.js");
+/* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _connectApiWeather__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./connectApiWeather */ "./src/connectApiWeather.js");
+/* harmony import */ var _showCurrentWeather__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./showCurrentWeather */ "./src/showCurrentWeather.js");
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+
+
+
+function homePage() {
+  return _homePage.apply(this, arguments);
+}
+
+function _homePage() {
+  _homePage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+    var weatherHome;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.next = 2;
+            return (0,_connectApiWeather__WEBPACK_IMPORTED_MODULE_1__["default"])('New York');
+
+          case 2:
+            weatherHome = _context.sent;
+            (0,_showCurrentWeather__WEBPACK_IMPORTED_MODULE_2__["default"])(weatherHome);
+
+          case 4:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _homePage.apply(this, arguments);
+}
+
+/***/ }),
+
 /***/ "./src/inputPlace.js":
 /*!***************************!*\
   !*** ./src/inputPlace.js ***!
@@ -122,8 +174,16 @@ function _initializeApp() {
 function inputPlace() {
   var inputCity = document.querySelector('#city');
   var btnShowWeather = document.querySelector('.btn-show-weather');
+  var boxForm = document.querySelector('.box-form');
+  var svgWeather = document.querySelector('.svg-weather');
+  var itensWeather = document.querySelector('.itens-weather');
+  var darkBackground = document.querySelector('.dark-background');
   btnShowWeather.addEventListener('click', function (e) {
     e.preventDefault();
+    svgWeather.classList.add('show');
+    itensWeather.classList.add('show-svg');
+    boxForm.classList.remove('show');
+    darkBackground.classList.remove('show');
     initializeApp(inputCity.value);
   });
 }
@@ -141,24 +201,87 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ showCurrentWeather)
 /* harmony export */ });
+function showSvgWeather(weather, cloudiness) {
+  var weatherIcon = document.querySelectorAll('#div-svg');
+  var partlyCloudy = document.querySelector('.partly-cloudy');
+
+  if (cloudiness <= 50 && weather !== 'Clear') {
+    for (var i = 0; i < weatherIcon.length; i += 1) {
+      weatherIcon[i].classList.remove('show-svg');
+    }
+
+    partlyCloudy.classList.add('show-svg');
+    return;
+  }
+
+  partlyCloudy.classList.remove('show-svg');
+
+  for (var _i = 0; _i < weatherIcon.length; _i += 1) {
+    weatherIcon[_i].classList.remove('show-svg');
+
+    if (weather === weatherIcon[_i].classList.value) {
+      weatherIcon[_i].classList.add('show-svg');
+    }
+  }
+}
+
 function showCurrentWeather(weather) {
-  var temp = document.querySelector('.temp');
+  var temperature = document.querySelector('.temperature');
   var rain = document.querySelector('.rain');
   var humidity = document.querySelector('.humidity');
   var weatherMain = document.querySelector('.weather-main');
   var cloud = document.querySelector('.cloud');
-  console.log(weather);
+  var wind = document.querySelector('.wind');
+  var location = document.querySelector('.location');
+  var numberTemperature = Number(weather.main.temp);
+  showSvgWeather(weather.weather[0].main, weather.clouds.all);
 
-  if (!weather.rain) {
-    rain.textContent = '';
+  if (weather.weather[0].main === 'Clear') {
+    document.documentElement.style.setProperty('--color-weather', '#f2b433');
+  } else if (weather.weather[0].main === 'Rain') {
+    document.documentElement.style.setProperty('--color-weather', '#8a91b1');
   } else {
-    rain.textContent = weather.rain['1h'];
+    document.documentElement.style.setProperty('--color-weather', '#5d79f0');
   }
 
-  temp.textContent = weather.main.temp;
-  humidity.textContent = weather.main.humidity;
+  if (!weather.rain) {
+    rain.textContent = 'Rainless';
+  } else {
+    rain.textContent = "".concat(weather.rain['1h'], "mm");
+  }
+
+  location.textContent = "".concat(weather.name, ", ").concat(weather.sys.country);
+  temperature.textContent = "".concat(numberTemperature.toFixed(), "\xB0C");
+  humidity.textContent = "".concat(weather.main.humidity, "%");
   weatherMain.textContent = weather.weather[0].description;
-  cloud.textContent = weather.clouds.all;
+  cloud.textContent = "".concat(weather.clouds.all, "%");
+  wind.textContent = "".concat(weather.wind.speed, "m/s");
+}
+
+/***/ }),
+
+/***/ "./src/showInputForm.js":
+/*!******************************!*\
+  !*** ./src/showInputForm.js ***!
+  \******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ showInputForm)
+/* harmony export */ });
+function showInputForm() {
+  var btnSearch = document.querySelector('.btn-search');
+  var boxForm = document.querySelector('.box-form');
+  var darkBackground = document.querySelector('.dark-background');
+  var inputCity = document.querySelector('#city');
+  btnSearch.addEventListener('click', function (e) {
+    e.preventDefault();
+    inputCity.value = '';
+    boxForm.classList.add('show');
+    darkBackground.classList.add('show');
+  });
 }
 
 /***/ }),
@@ -183,7 +306,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "", "",{"version":3,"sources":[],"names":[],"mappings":"","sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n  --color-weather: #5d79f0;\n}\n\nbody {\n  margin: 0;\n  font-family: sans-serif;\n}\n\n.dark-background {\n  background: #00000061;\n  position: fixed;\n  height: 100vh;\n  width: 100vw;\n  display: none;\n  z-index: 1;\n}\n\n.box-form {\n  display: none;\n  position: fixed;\n  width: 200px;\n  height: 250px;\n  z-index: 2;\n  top: 50%;\n  left: 50%;\n  background: white;\n  transform: translate(-50%, -50%);\n  border-radius: 10px;\n  box-shadow: 1px 1px 20px 2px;\n  padding: 20px 24px;\n}\n\n.title-form {\n  margin: 16px 0;\n}\n\n.subtitle-form {\n  color: #848486;\n}\n\n.btn-show-weather {\n  border: 1px solid #0449b0;\n  background-color: #0449b0;\n  border-radius: 7px;\n  color: white;\n  height: 30px;\n  width: 128px;\n  font-weight: 600;\n}\n\n#city {\n  margin-bottom: 16px;\n  border-radius: 10px;\n  border: 1px solid #e5eff8;\n  background-color: #e5eff8;\n  padding: 5px;\n  font-size: 1rem;\n  width: 190px;\n  color: #848486; \n}\n\n#city:focus {\n  outline: none;\n}\n\n.content {\n  background-color: #f5f6f7;\n  height: 100vh;\n}\n\n.svg-weather {\n  background-color: var(--color-weather);\n  min-height: 200px;\n}\n\n.btn-search {\n  position: absolute;\n  background: none;\n  border: none;\n  top: 4px;\n}\n\n.svg {\n  height: 150px;\n  width: 180px;\n}\n\n.location {\n  text-align: center;\n  color: white;\n  font-size: 1.2rem;\n  font-weight: 600;\n}\n\n.partly-cloudy, .night, .Drizzle, \n.night-partly-cloudy, .Clear, .Clouds,\n.Snow, .Rain, .Thunderstorm, .Mist {\n  display: none;\n  justify-content: center;\n}\n\n.temperature {\n  text-align: center;\n  color: white;\n  margin-top: 0px;\n}\n\n.itens-weather {\n  display: flex;\n  margin: 20px;\n  flex-direction: column;\n  gap: 10px;\n  background-color: white;\n  padding: 10px;\n  border-radius: 10px;\n  border: 1px solid white;\n  box-shadow: 0px 0px 3px 0px;\n}\n\n.list {\n  display: flex;\n  justify-content: space-between;\n  border-bottom: 2px solid var(--color-weather);\n  padding-bottom: 5px;\n}\n\nul {\n  list-style-type: none;\n  padding-left: 0;\n}\n\n.show-svg {\n  display: flex;\n}\n\n.show {\n  display: block;\n}\n\n.hide {\n  display: none;\n}", "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"AAAA;EACE,wBAAwB;AAC1B;;AAEA;EACE,SAAS;EACT,uBAAuB;AACzB;;AAEA;EACE,qBAAqB;EACrB,eAAe;EACf,aAAa;EACb,YAAY;EACZ,aAAa;EACb,UAAU;AACZ;;AAEA;EACE,aAAa;EACb,eAAe;EACf,YAAY;EACZ,aAAa;EACb,UAAU;EACV,QAAQ;EACR,SAAS;EACT,iBAAiB;EACjB,gCAAgC;EAChC,mBAAmB;EACnB,4BAA4B;EAC5B,kBAAkB;AACpB;;AAEA;EACE,cAAc;AAChB;;AAEA;EACE,cAAc;AAChB;;AAEA;EACE,yBAAyB;EACzB,yBAAyB;EACzB,kBAAkB;EAClB,YAAY;EACZ,YAAY;EACZ,YAAY;EACZ,gBAAgB;AAClB;;AAEA;EACE,mBAAmB;EACnB,mBAAmB;EACnB,yBAAyB;EACzB,yBAAyB;EACzB,YAAY;EACZ,eAAe;EACf,YAAY;EACZ,cAAc;AAChB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,yBAAyB;EACzB,aAAa;AACf;;AAEA;EACE,sCAAsC;EACtC,iBAAiB;AACnB;;AAEA;EACE,kBAAkB;EAClB,gBAAgB;EAChB,YAAY;EACZ,QAAQ;AACV;;AAEA;EACE,aAAa;EACb,YAAY;AACd;;AAEA;EACE,kBAAkB;EAClB,YAAY;EACZ,iBAAiB;EACjB,gBAAgB;AAClB;;AAEA;;;EAGE,aAAa;EACb,uBAAuB;AACzB;;AAEA;EACE,kBAAkB;EAClB,YAAY;EACZ,eAAe;AACjB;;AAEA;EACE,aAAa;EACb,YAAY;EACZ,sBAAsB;EACtB,SAAS;EACT,uBAAuB;EACvB,aAAa;EACb,mBAAmB;EACnB,uBAAuB;EACvB,2BAA2B;AAC7B;;AAEA;EACE,aAAa;EACb,8BAA8B;EAC9B,6CAA6C;EAC7C,mBAAmB;AACrB;;AAEA;EACE,qBAAqB;EACrB,eAAe;AACjB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,cAAc;AAChB;;AAEA;EACE,aAAa;AACf","sourcesContent":[":root {\n  --color-weather: #5d79f0;\n}\n\nbody {\n  margin: 0;\n  font-family: sans-serif;\n}\n\n.dark-background {\n  background: #00000061;\n  position: fixed;\n  height: 100vh;\n  width: 100vw;\n  display: none;\n  z-index: 1;\n}\n\n.box-form {\n  display: none;\n  position: fixed;\n  width: 200px;\n  height: 250px;\n  z-index: 2;\n  top: 50%;\n  left: 50%;\n  background: white;\n  transform: translate(-50%, -50%);\n  border-radius: 10px;\n  box-shadow: 1px 1px 20px 2px;\n  padding: 20px 24px;\n}\n\n.title-form {\n  margin: 16px 0;\n}\n\n.subtitle-form {\n  color: #848486;\n}\n\n.btn-show-weather {\n  border: 1px solid #0449b0;\n  background-color: #0449b0;\n  border-radius: 7px;\n  color: white;\n  height: 30px;\n  width: 128px;\n  font-weight: 600;\n}\n\n#city {\n  margin-bottom: 16px;\n  border-radius: 10px;\n  border: 1px solid #e5eff8;\n  background-color: #e5eff8;\n  padding: 5px;\n  font-size: 1rem;\n  width: 190px;\n  color: #848486; \n}\n\n#city:focus {\n  outline: none;\n}\n\n.content {\n  background-color: #f5f6f7;\n  height: 100vh;\n}\n\n.svg-weather {\n  background-color: var(--color-weather);\n  min-height: 200px;\n}\n\n.btn-search {\n  position: absolute;\n  background: none;\n  border: none;\n  top: 4px;\n}\n\n.svg {\n  height: 150px;\n  width: 180px;\n}\n\n.location {\n  text-align: center;\n  color: white;\n  font-size: 1.2rem;\n  font-weight: 600;\n}\n\n.partly-cloudy, .night, .Drizzle, \n.night-partly-cloudy, .Clear, .Clouds,\n.Snow, .Rain, .Thunderstorm, .Mist {\n  display: none;\n  justify-content: center;\n}\n\n.temperature {\n  text-align: center;\n  color: white;\n  margin-top: 0px;\n}\n\n.itens-weather {\n  display: flex;\n  margin: 20px;\n  flex-direction: column;\n  gap: 10px;\n  background-color: white;\n  padding: 10px;\n  border-radius: 10px;\n  border: 1px solid white;\n  box-shadow: 0px 0px 3px 0px;\n}\n\n.list {\n  display: flex;\n  justify-content: space-between;\n  border-bottom: 2px solid var(--color-weather);\n  padding-bottom: 5px;\n}\n\nul {\n  list-style-type: none;\n  padding-left: 0;\n}\n\n.show-svg {\n  display: flex;\n}\n\n.show {\n  display: block;\n}\n\n.hide {\n  display: none;\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1550,9 +1673,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! regenerator-runtime/runtime */ "./node_modules/regenerator-runtime/runtime.js");
 /* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _inputPlace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./inputPlace */ "./src/inputPlace.js");
+/* harmony import */ var _homePage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./homePage */ "./src/homePage.js");
+/* harmony import */ var _showInputForm__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./showInputForm */ "./src/showInputForm.js");
 
 
 
+
+
+(0,_homePage__WEBPACK_IMPORTED_MODULE_3__["default"])();
+(0,_showInputForm__WEBPACK_IMPORTED_MODULE_4__["default"])();
 (0,_inputPlace__WEBPACK_IMPORTED_MODULE_2__["default"])();
 })();
 
